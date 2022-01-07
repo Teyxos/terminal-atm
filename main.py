@@ -1,11 +1,12 @@
 from datetime import datetime
+from os import pardir
 
 
 def trasaction(func):
     def wrapper(self, amount):
         with open("./logs.txt", "a") as logs:
-            logs.write(f"Start transaction:{datetime.now()}\t")
             func(self, amount)
+            logs.write(f"Start transaction:{datetime.now()}\t")
             logs.write(f"End transaction:{datetime.now()}\n")
 
     return wrapper
@@ -37,6 +38,24 @@ class BankAccount:
 
         self.amount = total
 
+    @trasaction
+    def withdraw(self, amount):
+        try:
+            self.amount = float(self.amount)
+        except ValueError:
+            pass
+
+        if self.amount < amount:
+            print(f"You can't do that transaction!\t You have {self.amount} and you are trying to withdraw {amount}")
+            exit(0)
+        else:
+            total = self.amount - amount
+
+        with open("./logs.txt", "a") as logs:
+            logs.write(f"Withdraw:{amount}\t Amount:{total}\t")
+
+        self.amount = total
+
     def get_amount(self):
         with open("./logs.txt", "r") as logs:
             content = logs.read()
@@ -50,6 +69,14 @@ class BankAccount:
         return total
 
 
+# Create the Bank Account or accesing via logs.txt
 user = BankAccount(0.00)
-user.deposit(30.00)
-user.deposit(500.00)
+
+# Deposit
+user.deposit(1000.00)
+
+# Withdraw
+user.withdraw(1000.00)
+
+# Withdraw with less money
+user.withdraw(1000.00)
